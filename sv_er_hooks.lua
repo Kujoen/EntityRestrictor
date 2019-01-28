@@ -206,14 +206,5 @@ function er_toolcheck(ply, wep)
 end
 
 ----------------------------------------------------------------------------------------------------------|
---                                                                                                        |
---                                          CONNECTING                                                    |
---                                                                                                        |
 ----------------------------------------------------------------------------------------------------------|
 
-function er_spawncheck(name,ip)
-    print(name)
-end
-
-hook.Add("PlayerSpawn", "er_connectcheck", er_connectcheck)
-hook.Add("GM:PlayerSpawn", "er_connectcheck", er_connectcheck)
