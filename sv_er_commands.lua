@@ -27,20 +27,20 @@ local function er_commandhook(ply, message, team)
 
     if (isAllowAdmin == true and ply:IsAdmin()) then
         hasPermissions = true
-        print("Permissions granted, user is admin ")
     end
     
     if ply:IsSuperAdmin() then 
         hasPermissions = true
-        print("Permissions granted, user is superadmin ")
     end
     ------------------------------------------------------------------------|
 
 
     if hasPermissions == true then 
-
+        
         -- Jump out if not restriction command
-        if string.find(message, "/restrict") then 
+        local i = string.find(message, "/restrict")
+
+        if i != nil then 
 
             -- INIT ----------------------------------------------------------|
             local hasReason = false
@@ -90,12 +90,12 @@ local function er_commandhook(ply, message, team)
 
                                 -- Weapons 
                                 if string.find(restrictionTypes, "W") then 
-                                    restrictWeapons(plyToRestrict, restrictionLength, timeStamp)
+                                    restrictWeapons(ply, plyToRestrict, restrictionLength, timeStamp, hasReason, restrictionReason)
                                 end 
 
                                 --BuildTools
                                 if string.find(restrictionTypes, "B") then 
-                                    restrictBuildtools(plyToRestrict, restrictionLength, timeStamp)
+                                    restrictBuildtools(ply, plyToRestrict, restrictionLength, timeStamp, hasReason, restrictionReason)
                                 end 
                             end 
                         end 
@@ -126,30 +126,75 @@ end
 ----------------------------------------------------------------------------------------------------------|
 
 function restrictVehicles(admin, targetPly, restrictionLength, curTimeStamp, hasReason, reason)
-    -- SAVE THE RESTRICTION TO DATA
-    local playerSteamID = string.Replace(tostring(targetPly:SteamID()), ":", "_")
-    if hasReason then 
-        file.Write("entityrestrictor/"..playerSteamID.."_A.txt", curTimeStamp.."_"..restrictionLength.."_"..admin:Nick().."_"..reason)
-    else 
-        file.Write("entityrestrictor/"..playerSteamID.."_A.txt", curTimeStamp.."_"..restrictionLength.."_"..admin:Nick())
-    end 
-    
+    initializeRestriction(admin, targetPly, restrictionLength, curTimeStamp, hasReason, reason, "vehicles", "A")
+
     -- KICK PLAYER OUT OF ANY CURRENT VEHICLES
     if targetPly:InVehicle() then 
         targetPly:ExitVehicle()
     end
+end
 
-    -- PRINT TO CHAT
-    PrintMessage(HUD_PRINTTALK, targetPly:Nick().." has been restricted by "..admin:Nick().." from using vehicles for "..tostring(restrictionLength / 3600).." hours.")
-    if hasReason then 
-        PrintMessage(HUD_PRINTTALK, "Reason: "..reason)
+function restrictWeapons(admin, targetPly, restrictionLength, curTimeStamp, hasReason, reason)
+    initializeRestriction(admin, targetPly, restrictionLength, curTimeStamp, hasReason, reason, "weapons", "W")
+
+    -- REMOVE WEAPON FROM INVENTORY
+    if isBanAllWeapons then 
+        for k, v in pairs(targetPly:GetWeapons()) do
+            v:Remove()
+        end
+    else 
+        for kbWep, bWep in pairs(bannedWeapons) do
+            for kWep, wep in pairs(targetPly:GetWeapons()) do
+                if wep:GetClass() == bWep then 
+                    wep:Remove()
+                end
+            end
+        end
     end
 end
 
-function restrictWeapons(player, restrictionLength, curTimeStamp)
+function restrictBuildtools(admin, targetPly, restrictionLength, curTimeStamp, hasReason, reason)
+    initializeRestriction(admin, targetPly, restrictionLength, curTimeStamp, hasReason, reason, "Tools", "B")
+
+    local gravGunName = "weapon_physcannon"
+    local physGunName = "weapon_physgun"
+    local toolGunName = "gmod_tool"
+
+    -- REMOVE TOOLS FROM INVENTORY
+    for kWep, wep in pairs(targetPly:GetWeapons()) do
+        if wep:GetClass() == gravGunName && isRestrictGravityGun == true then 
+            wep:Remove()
+        end
+
+        if wep:GetClass() == physGunName && isRestrictPhysicsGun == true then 
+            wep:Remove()
+        end 
+
+        if wep:GetClass() == toolGunName && isRestrictToolGun == true then 
+            wep:Remove()
+        end
+    end
 end
 
-function restrictBuildtools(player, restrictionLength, curTimeStamp)
+----------------------------------------------------------------------------------------------------------|
+----------------------------------------------------------------------------------------------------------|
+
+function initializeRestriction(admin, targetPly, restrictionLength, curTimeStamp, hasReason, reason, type, typeFlag)
+    -- SAVE THE RESTRICTION TO DATA
+    local playerSteamID = string.Replace(tostring(targetPly:SteamID()), ":", "_")
+    if hasReason then 
+        file.Write("entityrestrictor/"..playerSteamID.."_"..typeFlag..".txt", curTimeStamp.."_"..restrictionLength.."_"..admin:Nick().."_"..reason)
+    else 
+        file.Write("entityrestrictor/"..playerSteamID.."_"..typeFlag..".txt", curTimeStamp.."_"..restrictionLength.."_"..admin:Nick())
+    end 
+    
+
+
+    -- PRINT TO CHAT
+    PrintMessage(HUD_PRINTTALK, targetPly:Nick().." has been restricted by "..admin:Nick().." from using "..type.." for "..tostring(restrictionLength / 3600).." hours.")
+    if hasReason then 
+        PrintMessage(HUD_PRINTTALK, "Reason: "..reason)
+    end
 end
 
 ----------------------------------------------------------------------------------------------------------|

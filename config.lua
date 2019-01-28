@@ -27,14 +27,13 @@ bannedVehicles = {
 }
 -----------------------------------------------------------------|
 --CONFIG :: WEAPONS ---------------------------------------------|
-isBanAllWeapons = true
+isBanAllWeapons = true -- True means also buildtools are restricted
 bannedWeapons = {
     
 }
 -----------------------------------------------------------------|
 --CONFIG :: BUILDTOOLS ------------------------------------------|
-isBanAllBuildTools = true
-bannedBuildTools = {
-
-}
+isRestrictGravityGun = true
+isRestrictToolGun = true
+isRestrictPhysicsGun = true
 -----------------------------------------------------------------|
