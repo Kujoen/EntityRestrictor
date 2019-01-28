@@ -122,7 +122,7 @@ end
 ----------------------------------------------------------------------------------------------------------|
 --                                                                                                        |  
 -- RESTRICTION HANDLING                                                                                   |
---                                                                                                        |  
+-- Restrictions saved as: timestamp_length_adminNick_reason                                               |  
 ----------------------------------------------------------------------------------------------------------|
 
 function restrictVehicles(admin, targetPly, restrictionLength, curTimeStamp, hasReason, reason)

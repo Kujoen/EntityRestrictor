@@ -17,24 +17,24 @@ limitations under the License.
 --CONFIG :: USERGROUPS ------------------------------------------|
 -- Set who can use the command
 
-local isAllowAdmin = true
+isAllowAdmin = true
 
 -----------------------------------------------------------------|
 --CONFIG :: VEHICLES --------------------------------------------|
-local isBanAllVehicles = true
-local bannedVehicles = {
+isBanAllVehicles = true
+bannedVehicles = {
     "Jeep"
 }
 -----------------------------------------------------------------|
 --CONFIG :: WEAPONS ---------------------------------------------|
-local isBanAllWeapons = true
-local bannedWeapons = {
+isBanAllWeapons = true
+bannedWeapons = {
     
 }
 -----------------------------------------------------------------|
 --CONFIG :: BUILDTOOLS ------------------------------------------|
-local isBanAllBuildTools = true
-local bannedBuildTools = {
+isBanAllBuildTools = true
+bannedBuildTools = {
 
 }
 -----------------------------------------------------------------|
