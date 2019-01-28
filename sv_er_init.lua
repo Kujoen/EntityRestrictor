@@ -13,10 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ]]
-include("EntityRestrictor/config.lua")
-include("EntityRestrictor/sv_er_commands.lua")
-include("EntityRestrictor/sv_er_hooks.lua")
+include("entityrestrictor/sv_er_config.lua")
+include("entityrestrictor/sv_er_commands.lua")
+include("entityrestrictor/sv_er_hooks.lua")
 
-if file.Exists("EntityRestrictor", "DATA") != true then 
-    file.CreateDir("EntityRestrictor")
+if file.Exists("entityrestrictor", "DATA") != true then 
+    file.CreateDir("entityrestrictor")
 end 
