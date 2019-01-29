@@ -1,5 +1,6 @@
 # EntityRestrictor
-A Module for GMOD servers.  
+A Module for GMOD servers. 
+Place in folder named entityrestrictor.  
 Allows restricting players from using vehicles, weapons or tools.  
 The restricting command has the following format: 
     
