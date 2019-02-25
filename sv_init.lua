@@ -20,3 +20,6 @@ include("entityrestrictor/sv_er_hooks.lua")
 if file.Exists("entityrestrictor", "DATA") != true then 
     file.CreateDir("entityrestrictor")
 end 
+
+-- Init credit Timer
+timer.Create("EntityRestrictorCreditsTimer", 600, 0 ,function() PrintMessage(HUD_PRINTTALK,"This server is using kujoen's EntityRestrictor v1.0 | github.com/Kujoen/EntityRestrictor") end)

@@ -36,11 +36,9 @@ local function er_commandhook(ply, message, team)
 
 
     if hasPermissions == true then 
-        
-        -- Jump out if not restriction command
-        local i = string.find(message, "/restrict")
-
-        if i != nil then 
+    
+        -- Check for restrict message
+        if string.find(message, "/restrict") != nil then 
 
             -- INIT ----------------------------------------------------------|
             local hasReason = false
@@ -82,26 +80,102 @@ local function er_commandhook(ply, message, team)
 
                             if isValidMessageSegment(restrictionTypes) then 
                                 local timeStamp = os.time()
-                                
+                                local hasValidType = false
+
                                 -- Vehicles
                                 if string.find(restrictionTypes, "A") then 
+                                    hasValidType = true 
                                     restrictVehicles(ply, plyToRestrict, restrictionLength, timeStamp, hasReason, restrictionReason)
                                 end 
 
                                 -- Weapons 
                                 if string.find(restrictionTypes, "W") then 
+                                    hasValidType = true 
                                     restrictWeapons(ply, plyToRestrict, restrictionLength, timeStamp, hasReason, restrictionReason)
                                 end 
 
                                 --BuildTools
-                                if string.find(restrictionTypes, "B") then 
+                                if string.find(restrictionTypes, "B") then
+                                    hasValidType = true  
                                     restrictBuildtools(ply, plyToRestrict, restrictionLength, timeStamp, hasReason, restrictionReason)
                                 end 
+
+                                if hasValidType == false then 
+                                    ply:PrintMessage(HUD_PRINTTALK, restrictionTypes .. " is not a valid restriction type. Please use A, W or B")
+                                end 
+                            else 
+                                ply:PrintMessage(HUD_PRINTTALK, "No restriction type found or it is invalid. Please make sure you follow the following format for restricting players: /restrict playerId restrictionType restrictionLength | restrictionReason")
                             end 
+                        else 
+                            ply:PrintMessage(HUD_PRINTTALK, "No restriction length found or it is invalid. Please make sure you follow the following format for restricting players: /restrict playerId restrictionType restrictionLength | restrictionReason")
                         end 
+                    else 
+                        ply:PrintMessage(HUD_PRINTTALK, "No player with specified ID found")
                     end 
+                else
+                    ply:PrintMessage(HUD_PRINTTALK, "No player id found or it is invalid. Please make sure you follow the following format for restricting players: /restrict playerId restrictionType restrictionLength | restrictionReason") 
                 end
-            end 
+            end
+            
+        -- Check for unrestrict message
+        elseif string.find(message, "/unrestrict") != nil then 
+
+            -- INIT ----------------------------------------------------------|
+            local restrictionCommands = string.Split(message, " ")
+
+            local commandKeyword = restrictionCommands[1]
+            local targetPlayerId = restrictionCommands[2]
+            local restrictionTypes = restrictionCommands[3]
+            ------------------------------------------------------------------|
+
+            if commandKeyword == "/unrestrict" then
+
+                if isValidMessageSegment(targetPlayerId) then 
+
+                    local plyToRestrict
+
+                    for k ,v in pairs(player.GetAll()) do
+                        if (v:UserID() == tonumber(targetPlayerId)) then 
+                            plyToRestrict = v   
+                        end
+                    end
+
+                    if plyToRestrict != nil then 
+
+                        if isValidMessageSegment(restrictionTypes) then 
+                            local hasValidType = false
+
+                            -- Vehicles
+                            if string.find(restrictionTypes, "A") then 
+                                hasValidType = true 
+                                unrestrictVehicles(ply, plyToRestrict)
+                            end 
+
+                            -- Weapons 
+                            if string.find(restrictionTypes, "W") then 
+                                hasValidType = true 
+                                unrestrictWeapons(ply, plyToRestrict)
+                            end 
+
+                            --BuildTools
+                            if string.find(restrictionTypes, "B") then
+                                hasValidType = true  
+                                unrestrictBuildtools(ply, plyToRestrict)
+                            end 
+
+                            if hasValidType == false then 
+                                ply:PrintMessage(HUD_PRINTTALK, restrictionTypes .. " is not a valid restriction type. Please use A, W or B")
+                            end
+                        else 
+                            ply:PrintMessage(HUD_PRINTTALK, "No restriction type found or it is invalid. Please make sure you follow the following format for unrestricting players: /unrestrict playerId restrictionType")
+                        end 
+                    else 
+                        ply:PrintMessage(HUD_PRINTTALK, "No player with specified ID found")
+                    end
+                else
+                    ply:PrintMessage(HUD_PRINTTALK, "No player id found or it is invalid. Please make sure you follow the following format for unrestricting players:  /unrestrict playerId restrictionType") 
+                end
+            end
         end
     end 
 end
@@ -154,7 +228,7 @@ function restrictWeapons(admin, targetPly, restrictionLength, curTimeStamp, hasR
 end
 
 function restrictBuildtools(admin, targetPly, restrictionLength, curTimeStamp, hasReason, reason)
-    initializeRestriction(admin, targetPly, restrictionLength, curTimeStamp, hasReason, reason, "Tools", "B")
+    initializeRestriction(admin, targetPly, restrictionLength, curTimeStamp, hasReason, reason, "tools", "B")
 
     local gravGunName = "weapon_physcannon"
     local physGunName = "weapon_physgun"
@@ -197,6 +271,46 @@ function initializeRestriction(admin, targetPly, restrictionLength, curTimeStamp
     end
 end
 
+----------------------------------------------------------------------------------------------------------|
+--                                                                                                        |  
+-- UNRESTRICT HANDLING                                                                                    |
+--                                                                                                        |  
+----------------------------------------------------------------------------------------------------------|
+
+function unrestrictVehicles(admin, plyToRestrict)
+    local playerSteamID = string.Replace(tostring(plyToRestrict:SteamID()), ":", "_")
+
+    if file.Exists("entityrestrictor/"..playerSteamID.."_A.txt", "DATA") then 
+        file.Delete("entityrestrictor/"..playerSteamID.."_A.txt")
+        PrintMessage(HUD_PRINTTALK, plyToRestrict:Nick().." has been unrestricted by "..admin:Nick().." from using vehicles")
+    else 
+        admin:PrintMessage(HUD_PRINTTALK, "Specified player has no vehicle restriction")
+    end
+end 
+
+function unrestrictWeapons(admin, plyToRestrict)
+    local playerSteamID = string.Replace(tostring(plyToRestrict:SteamID()), ":", "_")
+
+    if file.Exists("entityrestrictor/"..playerSteamID.."_W.txt", "DATA") then 
+        file.Delete("entityrestrictor/"..playerSteamID.."_W.txt")
+        PrintMessage(HUD_PRINTTALK, plyToRestrict:Nick().." has been unrestricted by "..admin:Nick().." from using weapons")
+    else 
+        admin:PrintMessage(HUD_PRINTTALK, "Specified player has no weapon restriction")
+    end
+end 
+
+function unrestrictBuildtools(admin, plyToRestrict)
+    local playerSteamID = string.Replace(tostring(plyToRestrict:SteamID()), ":", "_")
+    
+    if file.Exists("entityrestrictor/"..playerSteamID.."_B.txt", "DATA") then 
+        file.Delete("entityrestrictor/"..playerSteamID.."_B.txt")
+        PrintMessage(HUD_PRINTTALK, plyToRestrict:Nick().." has been unrestricted by "..admin:Nick().." from using tools")
+    else 
+        admin:PrintMessage(HUD_PRINTTALK, "Specified player has no tool restriction")
+    end
+end
+
+----------------------------------------------------------------------------------------------------------|
 ----------------------------------------------------------------------------------------------------------|
 
 

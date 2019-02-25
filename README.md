@@ -1,7 +1,8 @@
-# EntityRestrictor
+# EntityRestrictor v1.0
 A Module for GMOD servers. 
 Place in folder named entityrestrictor.  
 Allows restricting players from using vehicles, weapons or tools.  
+
 The restricting command has the following format: 
     
     /restrict playerId restrictionType restrictionLength | restrictionReason
@@ -17,6 +18,16 @@ The restricting command has the following format:
 
     restrictionReason: Must follow after the "|"
 
+The unrestrict command has the following format: 
+    
+    /unrestrict playerId restrictionType
+
+    playerId = userId, first column when typing "status" in console
+
+    restrictionType:
+        * A - Vehicles
+        * W - Weapons
+        * B - Tools
 
 
 
